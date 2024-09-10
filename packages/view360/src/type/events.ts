@@ -104,6 +104,10 @@ export interface LoadEvent {
   video: ProjectionOptions["video"];
 }
 
+export interface LoadFailedEvent {
+  message: string;
+}
+
 /**
  * An event that fires after projection changes
  * @ko 프로젝션이 변경되었을 때 발생하는 이벤트

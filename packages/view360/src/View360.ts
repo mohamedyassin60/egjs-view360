@@ -34,6 +34,7 @@ export interface View360Events {
   [EVENTS.READY]: EVENT_TYPES.ReadyEvent;
   [EVENTS.LOAD_START]: EVENT_TYPES.LoadStartEvent;
   [EVENTS.LOAD]: EVENT_TYPES.LoadEvent;
+  [EVENTS.LOAD_FAILED]: EVENT_TYPES.LoadFailedEvent;
   [EVENTS.PROJECTION_CHANGE]: EVENT_TYPES.ProjectionChangeEvent;
   [EVENTS.RESIZE]: EVENT_TYPES.ResizeEvent;
   [EVENTS.BEFORE_RENDER]: EVENT_TYPES.BeforeRenderEvent;
@@ -61,7 +62,9 @@ export interface View360Options extends CameraOptions, PanoControlOptions {
   canvasSelector: string;
   useResizeObserver: boolean;
   tabIndex: number | null;
-  on: Partial<{ [key in keyof View360Events]: (evt: View360Events[key]) => any }>;
+  on: Partial<{
+    [key in keyof View360Events]: (evt: View360Events[key]) => any;
+  }>;
   plugins: View360Plugin[];
   maxDeltaTime: number;
   debug: boolean;
@@ -127,28 +130,36 @@ class View360 extends Component<View360Events> {
    * console.log(viewer.rootEl); // Element with id "viewer"
    * ```
    */
-  public get rootEl() { return this._rootEl; }
+  public get rootEl() {
+    return this._rootEl;
+  }
   /**
    * Projection renderer.
    * @ko 프로젝션 렌더러.
    * @since 4.0.0
    * @readonly
    */
-  public get renderer() { return this._renderer; }
+  public get renderer() {
+    return this._renderer;
+  }
   /**
    * Projection camera.
    * @ko 프로젝션 카메라.
    * @since 4.0.0
    * @readonly
    */
-  public get camera() { return this._camera; }
+  public get camera() {
+    return this._camera;
+  }
   /**
    * Rotate/Zoom Controller.
    * @ko 회전/줌 컨트롤러.
    * @since 4.0.0
    * @readonly
    */
-  public get control() { return this._control; }
+  public get control() {
+    return this._control;
+  }
   /**
    * WebXR-based VR manager.
    * @ko WebXR 기반의 VR 기능 매니저 인스턴스.
@@ -161,7 +172,9 @@ class View360 extends Component<View360Events> {
    * viewer.vr.enter();
    * ```
    */
-  public get vr() { return this._vr; }
+  public get vr() {
+    return this._vr;
+  }
   /**
    * Hotspot renderer.
    * You can also change options of {@link View360Options#hotspot} with this.
@@ -170,7 +183,9 @@ class View360 extends Component<View360Events> {
    * @since 4.0.0
    * @readonly
    */
-  public get hotspot() { return this._hotspot; }
+  public get hotspot() {
+    return this._hotspot;
+  }
   /**
    * An array of plugins added.
    * @ko 추가된 플러그인의 배열
@@ -187,7 +202,9 @@ class View360 extends Component<View360Events> {
    * viewer.addPlugins(new LoadingSpinner()) // [ControlBar, LoadingSpinner];
    * ```
    */
-  public get plugins() { return this._plugins; }
+  public get plugins() {
+    return this._plugins;
+  }
   /**
    * An instance of {@link Projection} that currently enabled. `null` if not initialized yet.
    * You should call {@link View360#load} to change panorama src or projection type.
@@ -199,7 +216,9 @@ class View360 extends Component<View360Events> {
    * const viewer = new View360
    * ```
    */
-  public get projection() { return this._projection; }
+  public get projection() {
+    return this._projection;
+  }
   public set projection(val: View360Options["projection"]) {
     if (this._initialized && val) {
       this.load(val);
@@ -214,7 +233,9 @@ class View360 extends Component<View360Events> {
    * @since 4.0.0
    * @readonly
    */
-  public get mesh() { return this._mesh; }
+  public get mesh() {
+    return this._mesh;
+  }
   /**
    * A boolean value whether {@link View360#init init()} is called before.
    * @ko {@link View360#init init()}이 호출되었는지 여부를 가리키는 값
@@ -231,7 +252,9 @@ class View360 extends Component<View360Events> {
    * console.log(viewer.initialized); // true
    * ```
    */
-  public get initialized() { return this._initialized; }
+  public get initialized() {
+    return this._initialized;
+  }
   /**
    * Instance of the Autoplay manager.
    * You can also change {@link View360Options#autoplay} options with this.
@@ -245,7 +268,9 @@ class View360 extends Component<View360Events> {
    * viewer.autoplay.disable();
    * ```
    */
-  public get autoplay() { return this._autoplay; }
+  public get autoplay() {
+    return this._autoplay;
+  }
   /**
    * When this value is `true` and {@link View360Options#projection} is set, {@link View360#init init()} will be called automatically when instance is created.
    * @ko 이 값이 `true`이고, {@link View360Options#projection}이 설정되었으면, 인스턴스 생성 시점에 자동으로 {@link View360#init init()}을 호출합니다.
@@ -269,7 +294,9 @@ class View360 extends Component<View360Events> {
    * });
    * ```
    */
-  public get autoInit() { return this._autoInit; }
+  public get autoInit() {
+    return this._autoInit;
+  }
   /**
    * When `true`, {@link View360#resize} is called when the canvas size is changed.
    * @ko `true`일 경우, 캔버스의 크기가 변경되었을 때 자동으로 {@link View360#resize}를 호출합니다.
@@ -287,7 +314,9 @@ class View360 extends Component<View360Events> {
    * canvas.style.width = "400px";
    * ```
    */
-  public get autoResize() { return this._autoResize; }
+  public get autoResize() {
+    return this._autoResize;
+  }
   /**
    * CSS selector for canvas element to render panorama image/video.
    * The canvas element should be placed inside the root element. (Dont' have to be direct child)
@@ -310,14 +339,18 @@ class View360 extends Component<View360Events> {
    * });
    * ```
    */
-  public get canvasSelector() { return this._canvasSelector; }
+  public get canvasSelector() {
+    return this._canvasSelector;
+  }
   /**
    * When `true`, it will use {@link ResizeObserver} API to detect canvas size change when {@link View360Options#autoResize} is enabled.
    * @ko `true`일 때 {@link View360Options#autoResize}가 활성화되었으면, 사용 가능한 환경에서 {@link ResizeObserver} API를 사용해서 캔버스 크기 변화를 추적합니다.
    * @default true
    * @since 4.0.0
    */
-  public get useResizeObserver() { return this._useResizeObserver; }
+  public get useResizeObserver() {
+    return this._useResizeObserver;
+  }
   /**
    * {@link https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex tabindex} attribute for the canvas element.
    * This is necessary for the keyboard controls.
@@ -342,7 +375,9 @@ class View360 extends Component<View360Events> {
    * </div>
    * ```
    */
-  public get tabIndex() { return this._tabIndex; }
+  public get tabIndex() {
+    return this._tabIndex;
+  }
   public set tabIndex(val: View360Options["tabIndex"]) {
     const canvas = this._renderer.canvas;
     this._tabIndex = val;
@@ -361,8 +396,12 @@ class View360 extends Component<View360Events> {
    * @default 1 / 30
    * @since 4.0.0
    */
-  public get maxDeltaTime() { return this._animator.maxDeltaTime; }
-  public set maxDeltaTime(val: View360Options["maxDeltaTime"]) { this._animator.maxDeltaTime = val; }
+  public get maxDeltaTime() {
+    return this._animator.maxDeltaTime;
+  }
+  public set maxDeltaTime(val: View360Options["maxDeltaTime"]) {
+    this._animator.maxDeltaTime = val;
+  }
   /**
    * Enable WebGL debugging. Setting this to `true` can decrease performance.
    * This is used internally on developing View360.
@@ -370,8 +409,12 @@ class View360 extends Component<View360Events> {
    * 이 옵션은 View360을 개발하기 위해 내부적으로 사용됩니다.
    * @default false
    */
-  public get debug() { return this._debug; }
-  public set debug(val: View360Options["debug"]) { this._debug = val; }
+  public get debug() {
+    return this._debug;
+  }
+  public set debug(val: View360Options["debug"]) {
+    this._debug = val;
+  }
 
   // Camera options
   /**
@@ -392,8 +435,12 @@ class View360 extends Component<View360Events> {
    * });
    * ```
    */
-  public get initialYaw() { return this._camera.initialYaw; }
-  public set initialYaw(val: View360Options["initialYaw"]) { this._camera.initialYaw = val; }
+  public get initialYaw() {
+    return this._camera.initialYaw;
+  }
+  public set initialYaw(val: View360Options["initialYaw"]) {
+    this._camera.initialYaw = val;
+  }
   /**
    * Initial pitch (x-axis rotation) value for camera. (in degrees, °)
    * As View360 uses right-handed coordinate system internally, positive value will make camera to look upside, while negative value will look down.
@@ -412,8 +459,12 @@ class View360 extends Component<View360Events> {
    * });
    * ```
    */
-  public get initialPitch() { return this._camera.initialPitch; }
-  public set initialPitch(val: View360Options["initialPitch"]) { this._camera.initialPitch = val; }
+  public get initialPitch() {
+    return this._camera.initialPitch;
+  }
+  public set initialPitch(val: View360Options["initialPitch"]) {
+    this._camera.initialPitch = val;
+  }
   /**
    * Initial zoom value for camera.
    * Setting this value to `2` will enlarge panorama 200% by width.
@@ -432,8 +483,12 @@ class View360 extends Component<View360Events> {
    * });
    * ```
    */
-  public get initialZoom() { return this._camera.initialZoom; }
-  public set initialZoom(val: View360Options["initialZoom"]) { this._camera.initialZoom = val; }
+  public get initialZoom() {
+    return this._camera.initialZoom;
+  }
+  public set initialZoom(val: View360Options["initialZoom"]) {
+    this._camera.initialZoom = val;
+  }
   /**
    * Restrict yaw(y-axis rotation) range. (in degrees, °)
    * @ko yaw(y축 회전) 범위를 제한합니다. (도 단위, °)
@@ -451,7 +506,9 @@ class View360 extends Component<View360Events> {
    * });
    * ```
    */
-  public get yawRange() { return this._camera.yawRange; }
+  public get yawRange() {
+    return this._camera.yawRange;
+  }
   public set yawRange(val: View360Options["yawRange"]) {
     this._camera.yawRange = val;
     if (this._projection) this._projection.updateCamera(this._camera);
@@ -474,7 +531,9 @@ class View360 extends Component<View360Events> {
    * });
    * ```
    */
-  public get pitchRange() { return this._camera.pitchRange; }
+  public get pitchRange() {
+    return this._camera.pitchRange;
+  }
   public set pitchRange(val: View360Options["pitchRange"]) {
     this._camera.pitchRange = val;
     if (this._projection) this._projection.updateCamera(this._camera);
@@ -499,7 +558,9 @@ class View360 extends Component<View360Events> {
    * });
    * ```
    */
-  public get zoomRange() { return this._camera.zoomRange; }
+  public get zoomRange() {
+    return this._camera.zoomRange;
+  }
   public set zoomRange(val: View360Options["zoomRange"]) {
     this._camera.zoomRange = val;
     if (this._projection) this._projection.updateCamera(this._camera);
@@ -518,7 +579,9 @@ class View360 extends Component<View360Events> {
    * viewer.fov = 90;
    * ```
    */
-  public get fov() { return this._camera.fov; }
+  public get fov() {
+    return this._camera.fov;
+  }
   public set fov(val: View360Options["fov"]) {
     const camera = this._camera;
     const control = this._control;
@@ -537,7 +600,9 @@ class View360 extends Component<View360Events> {
    * @since 4.0.0
    * @readonly
    */
-  public get rotate() { return this._control.rotate; }
+  public get rotate() {
+    return this._control.rotate;
+  }
   /**
    * A control for camera zoom.
    * You can also change options of {@link View360Options#zoom} with this.
@@ -546,7 +611,9 @@ class View360 extends Component<View360Events> {
    * @since 4.0.0
    * @readonly
    */
-  public get zoom() { return this._control.zoom; }
+  public get zoom() {
+    return this._control.zoom;
+  }
   /**
    * A control for camera rotation with gyroscope input.
    * You can also change options of {@link View360Options#gyro} with this.
@@ -555,7 +622,9 @@ class View360 extends Component<View360Events> {
    * @since 4.0.0
    * @readonly
    */
-  public get gyro() { return this._control.gyro; }
+  public get gyro() {
+    return this._control.gyro;
+  }
   /**
    * Apply CSS {@link https://developer.mozilla.org/en-US/docs/Web/CSS/cursor cursor} by current state of input when using mouse.
    * If `true`, this will add CSS style to canvas element. It'll apply `cursor: "grab"` by default and `cursor: "grabbing"` when holding the mouse button.
@@ -564,16 +633,24 @@ class View360 extends Component<View360Events> {
    * @default true
    * @since 4.0.0
    */
-  public get useGrabCursor() { return this._control.useGrabCursor; }
-  public set useGrabCursor(val: View360Options["useGrabCursor"]) { this._control.useGrabCursor = val; }
+  public get useGrabCursor() {
+    return this._control.useGrabCursor;
+  }
+  public set useGrabCursor(val: View360Options["useGrabCursor"]) {
+    this._control.useGrabCursor = val;
+  }
   /**
    * Disable context menu which pops up on mouse right click.
    * @ko 마우스 우클릭시 표시되는 컨텍스트 메뉴를 비활성화합니다.
    * @default false
    * @since 4.0.0
    */
-  public get disableContextMenu() { return this._control.disableContextMenu; }
-  public set disableContextMenu(val: View360Options["disableContextMenu"]) { this._control.disableContextMenu = val; }
+  public get disableContextMenu() {
+    return this._control.disableContextMenu;
+  }
+  public set disableContextMenu(val: View360Options["disableContextMenu"]) {
+    this._control.disableContextMenu = val;
+  }
   /**
    * If `true`, enables scroll on mobile(touch) devices on canvas.
    * :::caution
@@ -586,8 +663,12 @@ class View360 extends Component<View360Events> {
    * @since 4.0.0
    * @default true
    */
-  public get scrollable() { return this._control.scrollable; }
-  public set scrollable(val: View360Options["scrollable"]) { this._control.scrollable = val; }
+  public get scrollable() {
+    return this._control.scrollable;
+  }
+  public set scrollable(val: View360Options["scrollable"]) {
+    this._control.scrollable = val;
+  }
   /**
    * If `true`, enables scroll by mouse wheel on canvas.
    * :::caution
@@ -600,8 +681,12 @@ class View360 extends Component<View360Events> {
    * @since 4.0.0
    * @default false
    */
-  public get wheelScrollable() { return this._control.wheelScrollable; }
-  public set wheelScrollable(val: View360Options["wheelScrollable"]) { this._control.wheelScrollable = val; }
+  public get wheelScrollable() {
+    return this._control.wheelScrollable;
+  }
+  public set wheelScrollable(val: View360Options["wheelScrollable"]) {
+    this._control.wheelScrollable = val;
+  }
 
   /**
    * Create new instance of View360
@@ -623,34 +708,37 @@ class View360 extends Component<View360Events> {
    * });
    * ```
    */
-  public constructor(root: string | HTMLElement, {
-    projection = null,
-    initialYaw = 0,
-    initialPitch = 0,
-    initialZoom = 1,
-    yawRange = null,
-    pitchRange = null,
-    zoomRange = null,
-    fov = 90,
-    useGrabCursor = true,
-    disableContextMenu = false,
-    rotate = true,
-    zoom = true,
-    gyro = false,
-    scrollable = true,
-    wheelScrollable = false,
-    autoplay = false,
-    hotspot = {},
-    autoInit = true,
-    autoResize = true,
-    canvasSelector = "canvas",
-    useResizeObserver = true,
-    on = {},
-    plugins = [],
-    maxDeltaTime = 1 / 30,
-    tabIndex = 0,
-    debug = false
-  }: Partial<View360Options> = {}) {
+  public constructor(
+    root: string | HTMLElement,
+    {
+      projection = null,
+      initialYaw = 0,
+      initialPitch = 0,
+      initialZoom = 1,
+      yawRange = null,
+      pitchRange = null,
+      zoomRange = null,
+      fov = 90,
+      useGrabCursor = true,
+      disableContextMenu = false,
+      rotate = true,
+      zoom = true,
+      gyro = false,
+      scrollable = true,
+      wheelScrollable = false,
+      autoplay = false,
+      hotspot = {},
+      autoInit = true,
+      autoResize = true,
+      canvasSelector = "canvas",
+      useResizeObserver = true,
+      on = {},
+      plugins = [],
+      maxDeltaTime = 1 / 30,
+      tabIndex = 0,
+      debug = false,
+    }: Partial<View360Options> = {}
+  ) {
     super();
 
     this._rootEl = getElement(root);
@@ -675,7 +763,7 @@ class View360 extends Component<View360Events> {
       fov,
       yawRange,
       pitchRange,
-      zoomRange
+      zoomRange,
     });
     this._control = new PanoControl(canvas, this._camera, {
       useGrabCursor,
@@ -684,7 +772,7 @@ class View360 extends Component<View360Events> {
       disableContextMenu,
       rotate,
       zoom,
-      gyro
+      gyro,
     });
     this._animator = new FrameAnimator(maxDeltaTime);
     this._autoplay = new Autoplay(this, canvas, autoplay);
@@ -718,7 +806,7 @@ class View360 extends Component<View360Events> {
       this._mesh = null;
     }
 
-    this._plugins.forEach(plugin => plugin.destroy(this));
+    this._plugins.forEach((plugin) => plugin.destroy(this));
 
     this._initialized = false;
   }
@@ -730,7 +818,10 @@ class View360 extends Component<View360Events> {
    */
   public async init() {
     if (!this._projection) {
-      throw new View360Error(ERROR.MESSAGES.PROVIDE_PROJECTION_FIRST, ERROR.CODES.PROVIDE_PROJECTION_FIRST);
+      throw new View360Error(
+        ERROR.MESSAGES.PROVIDE_PROJECTION_FIRST,
+        ERROR.CODES.PROVIDE_PROJECTION_FIRST
+      );
     }
 
     const renderer = this._renderer;
@@ -754,11 +845,14 @@ class View360 extends Component<View360Events> {
       this._autoplay.enable();
     }
 
-    this._plugins.forEach(plugin => {
+    this._plugins.forEach((plugin) => {
       plugin.init(this);
     });
 
     const texture = await this._loadTexture(projection);
+    if (!texture) {
+      return;
+    }
     this._applyProjection(projection, texture);
     hotspot.refresh();
     animator.start(this._renderFrameOnDemand);
@@ -796,6 +890,9 @@ class View360 extends Component<View360Events> {
 
     if (this._initialized) {
       const texture = await this._loadTexture(projection);
+      if (!texture) {
+        return false;
+      }
       this._applyProjection(projection, texture);
       this.renderFrame(0);
     } else {
@@ -824,7 +921,7 @@ class View360 extends Component<View360Events> {
 
     this._emit(EVENTS.RESIZE, {
       width,
-      height
+      height,
     });
   }
 
@@ -845,7 +942,9 @@ class View360 extends Component<View360Events> {
    */
   public addPlugins(...plugins: View360Plugin[]) {
     if (this._initialized) {
-      plugins.forEach(plugin => { plugin.init(this); });
+      plugins.forEach((plugin) => {
+        plugin.init(this);
+      });
     }
 
     this._plugins.push(...plugins);
@@ -866,7 +965,7 @@ class View360 extends Component<View360Events> {
    * ```
    */
   public removePlugins(...plugins: View360Plugin[]) {
-    plugins.forEach(plugin => {
+    plugins.forEach((plugin) => {
       const pluginIdx = this._plugins.indexOf(plugin);
 
       if (pluginIdx < 0) return;
@@ -921,8 +1020,8 @@ class View360 extends Component<View360Events> {
           camera.quaternion[0],
           camera.quaternion[1],
           camera.quaternion[2],
-          camera.quaternion[3]
-        ]
+          camera.quaternion[3],
+        ],
       });
     }
     camera.onFrameRender();
@@ -930,13 +1029,16 @@ class View360 extends Component<View360Events> {
     this._emit(EVENTS.RENDER);
   };
 
-  private _emit<K extends keyof View360Events>(eventName: K, ...params: EventParams<View360Events, K>) {
+  private _emit<K extends keyof View360Events>(
+    eventName: K,
+    ...params: EventParams<View360Events, K>
+  ) {
     const evtParams = params ? params[0] : {};
 
     this.trigger(eventName as any, {
       type: eventName,
       target: this,
-      ...evtParams
+      ...evtParams,
     });
   }
 
@@ -949,11 +1051,12 @@ class View360 extends Component<View360Events> {
 
     if (!this._initialized || !texture) return;
     if (
-      !camera.animation
-      && !control.animating
-      && !autoplay.playing
-      && !texture.isVideo()
-    ) return;
+      !camera.animation &&
+      !control.animating &&
+      !autoplay.playing &&
+      !texture.isVideo()
+    )
+      return;
 
     this.renderFrame(delta);
   };
@@ -970,7 +1073,7 @@ class View360 extends Component<View360Events> {
     renderer.renderVR(mesh, vr, frame);
 
     this._emit(EVENTS.RENDER);
-  }
+  };
 
   private _applyProjection(projection: Projection, texture: Texture) {
     const camera = this._camera;
@@ -989,27 +1092,35 @@ class View360 extends Component<View360Events> {
 
     this._mesh = newMesh;
     this._emit(EVENTS.PROJECTION_CHANGE, {
-      projection
+      projection,
     });
   }
 
-  private async _loadTexture(projection: Projection): Promise<Texture> {
+  private async _loadTexture(projection: Projection): Promise<Texture | null> {
     const contentLoader = new TextureLoader();
     const { src, video } = projection;
 
     this._emit(EVENTS.LOAD_START, {
       src,
-      video
+      video,
     });
 
-    const texture = await contentLoader.load(src, video);
+    try {
+      const texture = await contentLoader.load(src, video);
 
-    this._emit(EVENTS.LOAD, {
-      src,
-      video
-    });
+      this._emit(EVENTS.LOAD, {
+        src,
+        video,
+      });
 
-    return texture;
+      return texture;
+    } catch (e) {
+      this._emit(EVENTS.LOAD_FAILED, {
+        message: e,
+      });
+    }
+
+    return null;
   }
 
   private _resizeComponents() {
@@ -1040,20 +1151,20 @@ class View360 extends Component<View360Events> {
     const controlEventsToPropagate = [
       CONTROL_EVENTS.STATIC_CLICK,
       CONTROL_EVENTS.INPUT_START,
-      CONTROL_EVENTS.INPUT_END
+      CONTROL_EVENTS.INPUT_END,
     ];
 
-    controlEventsToPropagate.forEach(evtName => {
-      control.rotate.on(evtName, evt => {
+    controlEventsToPropagate.forEach((evtName) => {
+      control.rotate.on(evtName, (evt) => {
         this._emit(evtName, evt);
       });
 
-      control.zoom.on(evtName, evt => {
+      control.zoom.on(evtName, (evt) => {
         this._emit(evtName, evt);
       });
     });
 
-    vr.on(EVENTS.VR_START, evt => {
+    vr.on(EVENTS.VR_START, (evt) => {
       root.classList.add(DEFAULT_CLASS.IN_VR);
 
       animator.changeContext(evt.session);

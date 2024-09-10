@@ -21,7 +21,10 @@ class TextureLoader {
     this._loadChecker = new ImReady();
   }
 
-  public async load(src: ProjectionOptions["src"], video: ProjectionOptions["video"]): Promise<Texture> {
+  public async load(
+    src: ProjectionOptions["src"],
+    video: ProjectionOptions["video"]
+  ): Promise<Texture> {
     if (video) {
       return this.loadVideo(src, getObjectOption(video));
     } else {
@@ -37,32 +40,41 @@ class TextureLoader {
   public async loadImage(src: string | HTMLElement): Promise<Texture2D> {
     const images = this._toImageArray(src);
 
-    return this._load(images, resolve => {
+    return this._load(images, (resolve) => {
       const image = images[0];
 
-      resolve(new Texture2D({
-        source: image,
-        width: image.naturalWidth,
-        height: image.naturalHeight,
-        flipY: true
-      }));
+      resolve(
+        new Texture2D({
+          source: image,
+          width: image.naturalWidth,
+          height: image.naturalHeight,
+          flipY: true,
+        })
+      );
     });
   }
 
-  public async loadCubeImage(src: Array<string | HTMLElement>): Promise<TextureCube> {
+  public async loadCubeImage(
+    src: Array<string | HTMLElement>
+  ): Promise<TextureCube> {
     const images = this._toImageArray(src);
 
-    return this._load(images, resolve => {
-      resolve(new TextureCube({
-        sources: images,
-        width: images[0].naturalWidth,
-        height: images[0].naturalHeight,
-        flipY: false
-      }));
+    return this._load(images, (resolve) => {
+      resolve(
+        new TextureCube({
+          sources: images,
+          width: images[0].naturalWidth,
+          height: images[0].naturalHeight,
+          flipY: false,
+        })
+      );
     });
   }
 
-  public async loadVideo(src: ProjectionOptions["src"], videoConfig: Partial<VideoConfig>): Promise<TextureVideo> {
+  public async loadVideo(
+    src: ProjectionOptions["src"],
+    videoConfig: Partial<VideoConfig>
+  ): Promise<TextureVideo> {
     const config: VideoConfig = {
       autoplay: true,
       muted: true,
@@ -72,7 +84,7 @@ class TextureLoader {
     };
     const video = this._toVideoElement(src, config);
 
-    return this._load([video], resolve => {
+    return this._load([video], (resolve) => {
       const { autoplay, muted } = config;
 
       video.currentTime = 0;
@@ -80,26 +92,34 @@ class TextureLoader {
         video.play().catch(() => void 0);
       }
 
-      resolve(new TextureVideo({
-        source: video,
-        width: video.videoWidth,
-        height: video.videoHeight,
-        flipY: true
-      }));
+      resolve(
+        new TextureVideo({
+          source: video,
+          width: video.videoWidth,
+          height: video.videoHeight,
+          flipY: true,
+        })
+      );
     });
   }
 
-  private _load<T>(content: HTMLElement[], onLoad: (resolve: (value: T) => void) => void): Promise<T> {
+  private _load<T>(
+    content: HTMLElement[],
+    onLoad: (resolve: (value: T) => void) => void
+  ): Promise<T> {
     const loader = this._loadChecker;
 
     return new Promise((resolve, reject) => {
-      loader.once("ready", evt => {
+      loader.once("ready", (evt) => {
         if (evt.errorCount > 0) return;
 
         onLoad(resolve);
       });
 
-      loader.once("error", reject);
+      loader.once("error", (err) => {
+        throw new Error("Could not load resource.");
+        reject(err);
+      });
       loader.check(content);
     });
   }
@@ -107,7 +127,7 @@ class TextureLoader {
   private _toImageArray(src: ProjectionOptions["src"]): HTMLImageElement[] {
     const srcs = Array.isArray(src) ? src : [src];
 
-    return srcs.map(source => {
+    return srcs.map((source) => {
       if (isString(source)) {
         const imgEl = new Image();
 
@@ -121,11 +141,10 @@ class TextureLoader {
     });
   }
 
-  private _toVideoElement(src: ProjectionOptions["src"], {
-    muted,
-    loop,
-    volume
-  }: VideoConfig): HTMLVideoElement {
+  private _toVideoElement(
+    src: ProjectionOptions["src"],
+    { muted, loop, volume }: VideoConfig
+  ): HTMLVideoElement {
     if (src instanceof HTMLVideoElement) {
       return src;
     }
@@ -140,7 +159,7 @@ class TextureLoader {
     video.loop = loop;
 
     if (Array.isArray(src)) {
-      src.forEach(source => this._appendSourceElement(video, source));
+      src.forEach((source) => this._appendSourceElement(video, source));
     } else {
       this._appendSourceElement(video, src);
     }
@@ -153,7 +172,10 @@ class TextureLoader {
     return video;
   }
 
-  private _appendSourceElement(video: HTMLMediaElement, src: string | HTMLElement) {
+  private _appendSourceElement(
+    video: HTMLMediaElement,
+    src: string | HTMLElement
+  ) {
     if (src instanceof HTMLSourceElement) {
       return src;
     }

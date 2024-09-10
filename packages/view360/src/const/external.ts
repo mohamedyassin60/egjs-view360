@@ -40,6 +40,7 @@ export const EVENTS = {
   READY: "ready",
   LOAD_START: "loadStart",
   LOAD: "load",
+  LOAD_FAILED: "loadFailed",
   PROJECTION_CHANGE: "projectionChange",
   RESIZE: "resize",
   BEFORE_RENDER: "beforeRender",
@@ -49,7 +50,7 @@ export const EVENTS = {
   VIEW_CHANGE: "viewChange",
   STATIC_CLICK: "staticClick",
   VR_START: "vrStart",
-  VR_END: "vrEnd"
+  VR_END: "vrEnd",
 } as const;
 
 /**
@@ -73,5 +74,5 @@ export const EASING = {
     } else {
       return n1 * (x -= 2.625 / d1) * x + 0.984375;
     }
-  }
+  },
 } as const;
