@@ -105,6 +105,15 @@ export interface LoadEvent {
 }
 
 export interface LoadFailedEvent {
+  /**
+   * @copy ReadyEvent#type
+   */
+  type: string;
+  /**
+   * @copy ReadyEvent#target
+   */
+  target: View360;
+
   message: string;
 }
 
